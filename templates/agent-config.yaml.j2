@@ -11,7 +11,7 @@ rendezvousIP: {{ host.ipv6.ip }}
 {% if cluster.ntps is defined -%}
 additionalNTPSources:
 {% for ntp in cluster.ntps -%}
-- {{ ntp }}
+  - {{ ntp }}
 {% endfor -%}
 {% endif -%}
 hosts:
@@ -22,7 +22,7 @@ hosts:
     rootDeviceHints:
       deviceName: {{ host.disk }}
     networkConfig:
-      {% if host.vlan is defined and host.vlan.enabled -%}
+      {%- if host.vlan is defined and host.vlan.enabled %}
       interfaces:
         - name: {{ host.vlan.name }}
           type: vlan
@@ -39,7 +39,7 @@ hosts:
                 prefix-length: {{ host.ipv4.prefix }}
             {% endif -%}
             dhcp: {{ host.ipv4.dhcp|default('false')|lower }}
-          {% else %}
+          {% else -%}
           ipv4:
             enabled: false
           {% endif -%}
@@ -52,22 +52,21 @@ hosts:
                 prefix-length: {{ host.ipv6.prefix }}
             {% endif -%}
             dhcp: {{ host.ipv6.dhcp|default('false')|lower }}
-          {% else %}
+          {% else -%}
           ipv6:
             enabled: false
-          {% endif %}
+          {% endif -%}
+      {%- if cluster.dns is defined %}
       dns-resolver:
         config:
           server:
-            {% if host.ipv4 is defined and host.ipv4.enabled -%}
-            - {{ host.ipv4.dns }}
-            {% endif -%}
-            {% if host.ipv6 is defined and host.ipv6.enabled -%}
-            - {{ host.ipv6.dns }}
-            {% endif %}
+          {%- for dns in cluster.dns %}
+            - {{ dns }}
+          {%- endfor -%}
+      {%- endif %}
       routes:
         config:
-          {% if host.ipv4 is defined and host.ipv4.enabled -%}
+          {%- if host.ipv4 is defined and host.ipv4.enabled -%}
           - destination: 0.0.0.0/0
             next-hop-address: {{ host.ipv4.gateway }}
             next-hop-interface: {{ host.vlan.name }}
@@ -78,8 +77,8 @@ hosts:
             next-hop-address: {{ host.ipv6.gateway }}
             next-hop-interface: {{ host.vlan.name }}
             table-id: 254
-          {% endif %}
-      {% else -%}
+          {% endif -%}
+      {%- else -%}
       interfaces:
         - name: {{ host.interface }}
           type: ethernet
@@ -110,15 +109,14 @@ hosts:
           ipv6:
             enabled: false
           {% endif %}
+      {%- if cluster.dns is defined %}
       dns-resolver:
         config:
           server:
-            {% if host.ipv4 is defined and host.ipv4.enabled -%}
-            - {{ host.ipv4.dns }}
-            {% endif -%}
-            {% if host.ipv6 is defined and host.ipv6.enabled -%}
-            - {{ host.ipv6.dns }}
-            {% endif %}
+          {%- for dns in cluster.dns %}
+            - {{ dns }}
+          {%- endfor -%}
+      {%- endif -%}
       routes:
         config:
           {% if host.ipv4 is defined and host.ipv4.enabled -%}
@@ -132,7 +130,5 @@ hosts:
             next-hop-address: {{ host.ipv6.gateway }}
             next-hop-interface: {{ host.interface }}
             table-id: 254
-          {% endif -%}
-
-      {% endif -%}
-
+          {%- endif -%}
+      {%- endif -%}

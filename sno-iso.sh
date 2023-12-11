@@ -1,8 +1,8 @@
 #!/bin/bash
-# 
+#
 # Helper script to generate bootable ISO with OpenShift agent based installer
 # usage: ./sno-iso.sh -h
-# 
+#
 
 if ! type "yq" > /dev/null; then
   echo "Cannot find yq in the path, please install yq on the node first. ref: https://github.com/mikefarah/yq#install"
@@ -28,7 +28,7 @@ usage(){
   info "config file and ocp version are optional, examples:"
   info "- $0 sno130.yaml" " equals: $0 sno130.yaml stable-4.12"
   info "- $0 sno130.yaml 4.12.10"
-  echo 
+  echo
   info "Prepare a configuration file by following the example in config.yaml.sample"
   echo "-----------------------------------"
   echo "# content of config.yaml.sample"
@@ -47,7 +47,7 @@ then
 fi
 
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
-then 
+then
   usage
   exit
 fi
